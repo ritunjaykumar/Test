@@ -22,7 +22,7 @@
         android:layout_margin="4dp"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="Name" />
+        android:hint="image name" />
 
     <LinearLayout
         android:layout_width="match_parent"

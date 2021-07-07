@@ -3,6 +3,8 @@ package com.softgyan.test;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -27,6 +29,8 @@ public class AddImageDialog extends Dialog {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Window window = getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         ImageView imageView = findViewById(R.id.imageView);
         Glide.with(getContext()).load(imageUri).into(imageView);
         EditText editText = findViewById(R.id.etMessage);

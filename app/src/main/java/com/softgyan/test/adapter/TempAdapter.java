@@ -1,6 +1,9 @@
 package com.softgyan.test.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +20,7 @@ import com.bumptech.glide.Glide;
 import com.softgyan.test.R;
 import com.softgyan.test.models.TempModel;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -44,7 +48,14 @@ public class TempAdapter extends RecyclerView.Adapter<TempAdapter.ViewHolder> im
         TempModel tempModel = tempModelList.get(position);
         holder.textView.setText(tempModel.getImageName());
         Log.d("my_tag", "onBindViewHolder: imageUri :"+tempModel.getImageUri());
+
+
         Glide.with(context).load(tempModel.getImageUri()).into(holder.imageView);
+       /* try {
+            holder.imageView.setImageURI(Uri.parse(tempModel.getImageUri()));
+        }catch (Exception e){
+            Log.d("my_tag", "onBindViewHolder: error : "+e.getMessage());
+        }*/
     }
 
     @Override

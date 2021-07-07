@@ -1,6 +1,7 @@
 package com.softgyan.test;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -106,14 +107,16 @@ public class MainActivity extends AppCompatActivity {
     private void openGallery() {
         Log.d("MainActivity", "openGallery: cliking");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) ==
-                PackageManager.PERMISSION_GRANTED) {
-            Intent intent = new Intent();
-            intent.setAction(Intent.ACTION_GET_CONTENT);
+                PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE )== PackageManager.PERMISSION_GRANTED) {
+//            Intent intent = new Intent();
+//            intent.setAction(Intent.ACTION_GET_CONTENT);
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
             intent.setType("image/*");
             ActivityCompat.startActivityForResult(this, Intent.createChooser(intent, "select image"),
                     100, null);
         } else {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
 
     }
@@ -123,10 +126,9 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == 100 && resultCode == RESULT_OK && data != null) {
-//            final String data1 = getRealPathFromURI(data.getData());
             final Uri data1 = data.getData();
             if (data1 != null) {
-                Log.d("my_tag", "onActivityResult: uri : "+data1);
+                Log.d("my_tag", "onActivityResult: uri : " + data1);
                 AddImageDialog addImageDialog = new AddImageDialog(MainActivity.this, callback, data1.toString());
                 addImageDialog.show();
                 Log.d("my_tag", "onActivityResult: show");
@@ -134,26 +136,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private final AddImageDialog.Callback callback = (text, imageUri, imageDialog) -> {
         final int i = TempQuery.insertData(MainActivity.this, text, imageUri);
-        Log.d("my_tag", "image uri : "+imageUri);
+        Log.d("my_tag", "image uri : " + imageUri);
         if (i != -1) {
-            tempModels.add(new TempModel(i, text, imageUri));
-            tempAdapter.notifyDataSetChanged();
+            try {
+                tempModels.add(0, new TempModel(i, text, imageUri));
+                tempAdapter.notifyDataSetChanged();
+                setRecyclerView(tempModels);
+            }catch (Exception e){
+                Log.d("my_tag", "error: "+e.getMessage());
+            }
         }
-        Log.d("my_tag", "i: "+i);
+        Log.d("my_tag", "i: " + i + "size :"+tempModels.size());
         imageDialog.dismiss();
     };
 
-    public String getRealPathFromURI (Uri contentUri) {
-        String path = null;
-        String[] proj = { MediaStore.MediaColumns.DATA };
-        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
-        if (cursor.moveToFirst()) {
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-            path = cursor.getString(column_index);
-        }
-        cursor.close();
-        return path;
-    }
+
 }
